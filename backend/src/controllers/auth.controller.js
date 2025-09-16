@@ -15,20 +15,20 @@ import { sendWelcomeEmail } from "../emails/emailHandellers.js";
 export const signup = async (req, res) => {
   // Extract user data from request body
   const { fullName, email, password } = req.body;
-  
+
   try {
     // Validate required fields
     if (!fullName || !email || !password) {
       return res.status(400).json({ message: "جميع الحقول مطلوبة!" });
     }
-    
+
     // Validate password length (minimum 6 characters)
     if (password.length < 6) {
       return res
         .status(400)
         .json({ message: "يجب أن تكون كلمة المرور 6 أحرف على الأقل!" });
     }
-    
+
     // Simple email regex for validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -36,32 +36,32 @@ export const signup = async (req, res) => {
         .status(400)
         .json({ message: "عنوان البريد الإلكتروني غير صالح!" });
     }
-    
+
     // Check if user already exists in database
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "المستخدم موجود بالفعل!" });
     }
-    
+
     // Hash the password for security
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    
+
     // Create a new user instance
     const newUser = new User({
       fullName,
       email,
       password: hashedPassword,
     });
-    
+
     // Check if user was created successfully
     if (newUser) {
       // Generate JWT token for authentication
       generateToken(newUser._id, res);
-      
+
       // Save user to database
       const saveUser = await newUser.save();
-      
+
       // Return user data (excluding password) with success status
       res.status(201).json({
         _id: newUser._id,
@@ -69,7 +69,7 @@ export const signup = async (req, res) => {
         email: newUser.email,
         profilePic: newUser.profilePic,
       });
-      
+
       // Send welcome email to new user (non-blocking)
       try {
         await sendWelcomeEmail(
@@ -90,4 +90,28 @@ export const signup = async (req, res) => {
     console.error("Error during signup:", error);
     res.status(500).json({ message: "حدث خطأ في الخادم." });
   }
+};
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: " البيانات غير صحيحة." });
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect)
+      return res.status(400).json({ message: " البيانات غير صحيحة." });
+    generateToken(user._id, res);
+    res.status(200).json({
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      profilePic: user.profilePic,
+    });
+  } catch (error) {
+    console.error("Error during login:", error);
+    res.status(500).json({ message: "حدث خطأ في الخادم." });
+  }
+};
+export const logout = (req, res) => {
+  res.cookie("token", "", { httpOnly: true, expires: new Date(0),maxAge: 0 });
+  res.status(200).json({ message: "تم تسجيل الخروج بنجاح." });
 };
