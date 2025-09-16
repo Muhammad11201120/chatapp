@@ -16,17 +16,17 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>Vite + React</h1>
+      <h1>MOCHAT</h1>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+          العداد: {count}
         </button>
         <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
+          عدّل <code>src/App.jsx</code> ثم احفظ لتجربة HMR
         </p>
       </div>
       <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
+        اضغط على شعاري فيت وريّأكت لمعرفة المزيد
       </p>
     </>
   )
