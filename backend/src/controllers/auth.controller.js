@@ -93,7 +93,21 @@ export const signup = async (req, res) => {
 };
 export const login = async (req, res) => {
   const { email, password } = req.body;
+  
   try {
+    // Validate required fields
+    if (!email || !password) {
+      return res.status(400).json({ message: "جميع الحقول مطلوبة!" });
+    }
+
+    // Simple email regex for validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res
+        .status(400)
+        .json({ message: "عنوان البريد الإلكتروني غير صالح!" });
+    }
+
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: " البيانات غير صحيحة." });
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
