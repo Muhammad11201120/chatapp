@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { generateToken } from "../lib/utils.js";
 import { ENV } from "../lib/env.js";
 import { sendWelcomeEmail } from "../emails/emailHandellers.js";
-
+import cloudinary from "../lib/cloudinary.js";
 /**
  * User signup controller
  * Handles user registration with validation, password hashing, and welcome email
@@ -93,7 +93,7 @@ export const signup = async (req, res) => {
 };
 export const login = async (req, res) => {
   const { email, password } = req.body;
-  
+
   try {
     // Validate required fields
     if (!email || !password) {
@@ -126,6 +126,35 @@ export const login = async (req, res) => {
   }
 };
 export const logout = (req, res) => {
-  res.cookie("token", "", { httpOnly: true, expires: new Date(0),maxAge: 0 });
+  res.cookie("token", "", { httpOnly: true, expires: new Date(0), maxAge: 0 });
   res.status(200).json({ message: "تم تسجيل الخروج بنجاح." });
+};
+export const updateProfile = async (req, res) => {
+  try {
+    const { profilePic, fullName } = req.body;
+    //validate required fields
+    if (!fullName) 
+      return res.status(400).json({ message: "الاسم مطلوب" });
+    if (!profilePic) 
+      return res.status(400).json({ message: "الصورة مطلوبة" });
+    if (profilePic.size > 1024 * 1024 * 5)
+      return res.status(400).json({ message: "الصورة يجب أن تكون أقل من 5MB" });
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "المستخدم غير موجود" });
+    // Upload new profile picture to Cloudinary
+    const uploadResponse = await cloudinary.uploader.upload(profilePic, {
+      folder: "profile_pics",
+      width: 150,
+      height: 150,
+      crop: "fill",
+    });
+    // Update user's profilePic field with the new URL
+    user.profilePic = uploadResponse.secure_url;
+    user.fullName = fullName;
+    await user.save();
+    res.status(200).json({ profilePic: user.profilePic });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({ message: "حدث خطأ في الخادم." });
+  }
 };
