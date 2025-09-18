@@ -14,7 +14,7 @@ router.use(arcjetMiddleware);
 router.post("/signup", signup);
 router.post("/login", login);
 router.post("/logout", logout);
-router.put("/updat  e-profile", protectRoute, updateProfile);
+router.put("/update-profile", protectRoute, updateProfile);
 // Route to check if user is authenticated
 router.get("/check-auth", protectRoute, (req, res) => {
   res.status(200).json({ message: "المستخدم مصرح به", user: req.user });
