@@ -5,12 +5,17 @@ import path from "path";
 import { connectDB } from "./lib/db.js";
 import { ENV } from "./lib/env.js";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 const app = express();
 const PORT = ENV.PORT || 3000;
 // Serve static files from the React frontend app
 const __dirname = path.resolve();
 
 app.use(express.json()); // Middleware to parse JSON request bodies
+app.use(cors({
+  origin: ENV.CLIENT_URL,
+  credentials: true,
+}));
 app.use(cookieParser()); // Middleware to parse cookies
 
 app.use("/api/auth", authRoutes);

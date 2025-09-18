@@ -10,7 +10,7 @@ const generateToken = (userId, res) => {
   });
   res.cookie("token", token, {
     httpOnly: true, // Accessible only by web server preventing XSS attacks
-    secure: ENV.NODE_ENV === "production", // Ensures the browser only sends the cookie over HTTPS
+    secure: ENV.NODE_ENV === "development" ? false : true, // Ensures the browser only sends the cookie over HTTPS
     sameSite: "Strict", // CSRF protection
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   });

@@ -6,15 +6,13 @@ export const arcjetMiddleware = async (req, res, next) => {
     const result = await aj.protect(req);
     if (result.isDenied()) {
       if (result.reason.isRateLimit())
-        return res
-          .status(429)
-          .json({ message: "محظور! طلبات كثيرة جداً!" });
+        return res.status(429).json({ message: "محظور! طلبات كثيرة جداً!" });
       else if (result.reason.isBot())
+        return res.status(403).json({ message: "محظور! تم اكتشاف وصول بوت!" });
+      else
         return res
           .status(403)
-          .json({ message: "محظور! تم اكتشاف وصول بوت!" });
-      else
-        return res.status(403).json({ message: "محظور! تم اكتشاف وصول غير مصرح!" });
+          .json({ message: "محظور! تم اكتشاف وصول غير مصرح!" });
     }
     // check spoofed bot
     const isSpoofed = await isSpoofedBot(req);

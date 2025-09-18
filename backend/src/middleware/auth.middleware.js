@@ -7,9 +7,7 @@ export const protectRoute = async (req, res, next) => {
     const token = req.cookies?.token;
     // Check if token exists
     if (!token)
-      return res
-        .status(401)
-        .json({ message: "غير مصرح، يرجى تسجيل الدخول!" });
+      return res.status(401).json({ message: "غير مصرح، يرجى تسجيل الدخول!" });
     const decoded = jwt.verify(token, ENV.JWT_SECRET);
     // Check if token is valid
     if (!decoded)
