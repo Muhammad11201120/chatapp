@@ -24,7 +24,7 @@ export const useChatStore = create((set, get) => ({
       const response = await axiosInstance.get("/messages/contacts");
       set({ allContacts: response.data });
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error?.response?.data?.message);
     } finally {
       set({ isUsersLoadding: false });
     }
@@ -35,9 +35,20 @@ export const useChatStore = create((set, get) => ({
       const response = await axiosInstance.get("/messages/chats");
       set({ chats: response.data });
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error?.response?.data?.message);
     } finally {
       set({ isUsersLoadding: false });
+    }
+  },
+  getMessagesByUserId: async (userId) => {
+    set({ isMessagesLadding: true });
+    try {
+      const response = await axiosInstance.get(`/messages/${userId}`);
+      set({ messages: response.data });
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "حدث خطأ في الخادم.");
+    } finally {
+      set({ isMessagesLadding: false });
     }
   },
 }));
