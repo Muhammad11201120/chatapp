@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import BorderAnimatedContainer from "../components/BorderAnimatedContainer";
 import {
   MessageCircleIcon,
@@ -27,7 +27,7 @@ const SignUpPage = () => {
         <BorderAnimatedContainer>
           <div className="w-full flex flex-col md:flex-row">
             {/* FORM RIGHT SIDE */}
-            <div className="md:w-1/2 p-8 flex items-center justify-center md:border-r  border-slate-600/30">
+            <div className="md:w-1/2 p-8 flex items-center justify-center md:border-l  border-slate-600/30">
               <div className="w-full max-w-md">
                 {/* Heading Text */}
                 <div className="text-center mb-8">
@@ -110,7 +110,7 @@ const SignUpPage = () => {
               </div>
             </div>
             {/* FORM LEFT SIDE */}
-            <div className="hidden md:w-1/2 md:flex items-center justify-center p-6 bg-gradient-to-bl from-slate-800/20 to-transparent">
+            <div className="hidden md:w-1/2 md:flex items-center justify-center p-6 bg-gradient-to-br from-slate-800/20 to-transparent">
               <div>
                 <img
                   src="/signup.png"
