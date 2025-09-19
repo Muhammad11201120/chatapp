@@ -116,9 +116,8 @@ export const logout = (req, res) => {
 };
 export const updateProfile = async (req, res) => {
   try {
-    const { profilePic, fullName } = req.body;
+    const { profilePic } = req.body;
     //validate required fields
-    if (!fullName) return res.status(400).json({ message: "الاسم مطلوب" });
     if (!profilePic) return res.status(400).json({ message: "الصورة مطلوبة" });
     if (profilePic.size > 1024 * 1024 * 5)
       return res.status(400).json({ message: "الصورة يجب أن تكون أقل من 5MB" });
@@ -133,7 +132,6 @@ export const updateProfile = async (req, res) => {
     });
     // Update user's profilePic field with the new URL
     user.profilePic = uploadResponse.secure_url;
-    user.fullName = fullName;
     await user.save();
     res.status(200).json({ profilePic: user.profilePic });
   } catch (error) {
