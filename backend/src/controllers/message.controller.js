@@ -24,8 +24,8 @@ export const getMessagesByUserId = async (req, res) => {
     const messages = await Message.find({
       // OR condition to get messages from both sides
       $or: [
-        { sender: myId, receiver: partnerId },
-        { sender: partnerId, receiver: myId },
+        { senderId: myId, receiverId: partnerId },
+        { senderId: partnerId, receiverId: myId },
       ],
     });
     res.status(200).json(messages);
@@ -58,8 +58,8 @@ export const sendMessage = async (req, res) => {
       imageUrl = result.secure_url;
     }
     const newMessage = new Message({
-      sender: senderId,
-      receiver: receiverId,
+      senderId,
+      receiverId,
       text,
       image: imageUrl,
     });
@@ -85,7 +85,6 @@ export const getChatPartners = async (req, res) => {
         ? message.receiverId.toString()
         : message.senderId.toString();
     });
-    res.status(200).json(chatPartners);
     //remove duplicates
     const uniqueChatPartners = [...new Set(chatPartners)];
     //find users by their ids

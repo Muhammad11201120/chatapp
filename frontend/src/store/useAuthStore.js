@@ -7,12 +7,13 @@ export const useAuthStore = create((set) => ({
   isCheckingAuth: true,
   isSigningUp: false,
   isLoggingIn: false,
+  isUpdatingProfilePic: false,
   checkAuth: async () => {
     try {
       //check if user is authenticated
       const response = await axiosInstance.get("/auth/check-auth");
       //if user is authenticated, set the auth user
-      set({ authUser: response.data });
+      set({ authUser: response.data.user });
     } catch (error) {
       console.log(error);
       //if user is not authenticated, set the auth user to null
@@ -56,6 +57,22 @@ export const useAuthStore = create((set) => ({
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
+    }
+  },
+  updateProfilePic: async (data) => {
+    set({ isUpdatingProfilePic: true });
+    try {
+      const response = await axiosInstance.put("/auth/update-profile", data);
+      set((state) => ({
+        authUser: state.authUser
+          ? { ...state.authUser, profilePic: response.data.profilePic }
+          : null,
+      }));
+      toast.success("تم تحديث الصورة الشخصية بنجاح");
+    } catch (error) {
+      toast.error(error.response.data.message);
+    } finally {
+      set({ isUpdatingProfilePic: false });
     }
   },
 }));
