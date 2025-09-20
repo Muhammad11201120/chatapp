@@ -6,13 +6,27 @@ import NoChatHistoryPlaceholder from "./NoChatHistoryPlaceholder";
 import MessageLoadingSkeleton from "./MessageLoadingSkeleton";
 import MessageInput from "./MessageInput";
 function ChatContainer() {
-  const { selectedUser, messages, isMessagesLadding, getMessagesByUserId } =
-    useChatStore();
+  const {
+    selectedUser,
+    messages,
+    isMessagesLadding,
+    getMessagesByUserId,
+    subscribeToNewMessages,
+    unsubscribeFromNewMessages,
+  } = useChatStore();
   const { authUser } = useAuthStore();
   const messagesEndRef = useRef(null);
   useEffect(() => {
     getMessagesByUserId(selectedUser._id);
-  }, [selectedUser, getMessagesByUserId]);
+    subscribeToNewMessages();
+    //cleaning up the effect
+    return () => unsubscribeFromNewMessages();
+  }, [
+    selectedUser,
+    getMessagesByUserId,
+    subscribeToNewMessages,
+    unsubscribeFromNewMessages,
+  ]);
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
