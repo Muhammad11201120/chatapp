@@ -10,20 +10,27 @@ const ChatPage = () => {
   const { activeTab, selectedUser } = useChatStore();
 
   return (
-    <div className="relative w-full max-w-6xl h-[800px]">
+    <div className="relative w-full max-w-6xl h-[calc(100vh-4rem)] md:h-[800px] px-3 md:px-0">
       <BorderAnimatedContainer>
-        {/* RIGHT SIDE */}
-        <div className="w-80 bg-slate-800/50 backdrop-blur-sm flex flex-col">
+        {/* Sidebar (List) - visible by default on mobile when no chat is selected; always visible on md+ */}
+        <div
+          className={`bg-slate-800/50 backdrop-blur-sm flex flex-col w-full md:w-80 ${
+            selectedUser ? "hidden md:flex" : "flex"
+          }`}
+        >
           <ProfileHeader />
           <ActiveTabSwitch />
-
           <div className="flex-1 overflow-y-auto p-4 space-y-2">
             {activeTab === "chats" ? <ChatsList /> : <ContactsList />}
           </div>
         </div>
 
-        {/* LEFT SIDE */}
-        <div className="flex-1 flex flex-col bg-slae-800/50 backdrop-blur-sm">
+        {/* Chat Pane - hidden on mobile until a chat is selected; always visible on md+ */}
+        <div
+          className={`flex-1 flex flex-col bg-slate-800/50 backdrop-blur-sm ${
+            selectedUser ? "flex" : "hidden md:flex"
+          }`}
+        >
           {selectedUser ? <ChatContainer /> : <NoConversationPlaceHolder />}
         </div>
       </BorderAnimatedContainer>
