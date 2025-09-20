@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
+import { useAuthStore } from "./useAuthStore";
 
 export const useChatStore = create((set, get) => ({
   allContacts: [],
@@ -49,6 +50,37 @@ export const useChatStore = create((set, get) => ({
       toast.error(error?.response?.data?.message || "حدث خطأ في الخادم.");
     } finally {
       set({ isMessagesLadding: false });
+    }
+  },
+  sendMessage: async (message) => {
+    const { selectedUser, messages } = get();
+    set({ isSendingMessage: true });
+    const { authUser } = useAuthStore.getState();
+    const tempId = `temp-${Date.now()}`;
+    const optimisticMessage = {
+      _id: tempId,
+      senderId: authUser._id,
+      receiverId: selectedUser._id,
+      text: message.text,
+      image: message.image,
+      createdAt: new Date().toISOString(),
+      isOptimistic: true,
+    };
+    //immediatly update the messages with the optimistic message
+    set({ messages: messages.concat(optimisticMessage) });
+
+    try {
+      const response = await axiosInstance.post(
+        `/messages/send/${selectedUser._id}`,
+        message
+      );
+      set({ messages: messages.concat(response.data) });
+    } catch (error) {
+      //remove the optimistic message
+      set({ messages: message });
+      toast.error(error?.response?.data?.message || "حدث خطأ في الخادم.");
+    } finally {
+      set({ isSendingMessage: false });
     }
   },
 }));
