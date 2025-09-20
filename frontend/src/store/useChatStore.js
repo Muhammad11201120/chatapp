@@ -11,6 +11,7 @@ export const useChatStore = create((set, get) => ({
   selectedUser: null,
   isUsersLoadding: false,
   isMessagesLadding: false,
+  isSendingMessage: false,
   isSoundEnabled: JSON.parse(localStorage.getItem("isSoundEnabled")) === true,
 
   toggleSound: () => {
@@ -53,9 +54,11 @@ export const useChatStore = create((set, get) => ({
     }
   },
   sendMessage: async (message) => {
-    const { selectedUser, messages } = get();
+    const { selectedUser } = get();
+    if (!selectedUser?._id) return;
     set({ isSendingMessage: true });
     const { authUser } = useAuthStore.getState();
+
     const tempId = `temp-${Date.now()}`;
     const optimisticMessage = {
       _id: tempId,
@@ -66,18 +69,28 @@ export const useChatStore = create((set, get) => ({
       createdAt: new Date().toISOString(),
       isOptimistic: true,
     };
-    //immediatly update the messages with the optimistic message
-    set({ messages: messages.concat(optimisticMessage) });
+
+    // Append optimistic message using functional update to avoid stale state
+    set((state) => ({ messages: state.messages.concat(optimisticMessage) }));
 
     try {
       const response = await axiosInstance.post(
         `/messages/send/${selectedUser._id}`,
         message
       );
-      set({ messages: messages.concat(response.data) });
+      // Replace optimistic temp message with server response
+      set((state) => ({
+        messages: state.messages.map((m) =>
+          m._id === tempId ? response.data : m
+        ),
+      }));
     } catch (error) {
-      //remove the optimistic message
-      set({ messages: message });
+      // Keep the message visible and flag as error for UI
+      set((state) => ({
+        messages: state.messages.map((m) =>
+          m._id === tempId ? { ...m, isError: true } : m
+        ),
+      }));
       toast.error(error?.response?.data?.message || "حدث خطأ في الخادم.");
     } finally {
       set({ isSendingMessage: false });
