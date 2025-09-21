@@ -10,7 +10,7 @@ const ChatPage = () => {
   const { activeTab, selectedUser } = useChatStore();
 
   return (
-    <div className="relative w-full max-w-6xl h-[calc(100vh-4rem)] md:h-[800px] px-3 md:px-0">
+    <div className="relative w-full max-w-7xl h-[98dvh] md:h-[800px] px-0 md:px-0">
       <BorderAnimatedContainer>
         {/* Sidebar (List) - visible by default on mobile when no chat is selected; always visible on md+ */}
         <div
