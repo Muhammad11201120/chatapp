@@ -37,7 +37,7 @@ const MessageInput = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
   return (
-    <div className="p-4 border-t border-slate-700/50">
+    <div className="p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t border-slate-700/50 sticky bottom-0 bg-slate-900/70 backdrop-blur-sm">
       {imagePreview && (
         <div className="max-w-3xl mx-auto mb-3 flex items-center">
           <div className="relative">
@@ -67,6 +67,19 @@ const MessageInput = () => {
           onChange={(e) => {
             setText(e.target.value);
             isSoundEnabled && playRandomKeyStrokeSound();
+          }}
+          onFocus={() => {
+            // Ensure input is visible above keyboard
+            requestAnimationFrame(() => {
+              try {
+                document.activeElement?.scrollIntoView({
+                  block: "nearest",
+                  inline: "nearest",
+                });
+              } catch {
+                return;
+              }
+            });
           }}
           className="flex-1 bg-slate-800/50 border border-slate-700/50 rounded-lg py-2 px-4"
           placeholder="اكتب رسالتك..."

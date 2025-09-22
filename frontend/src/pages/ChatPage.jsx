@@ -10,7 +10,7 @@ const ChatPage = () => {
   const { activeTab, selectedUser } = useChatStore();
 
   return (
-    <div className="relative w-full max-w-7xl h-[98dvh] md:h-[800px] px-0 md:px-0">
+    <div className="relative w-full max-w-7xl h-[100dvh] md:h-[800px] px-0 md:px-0">
       <BorderAnimatedContainer>
         {/* Sidebar (List) - visible by default on mobile when no chat is selected; always visible on md+ */}
         <div
@@ -27,7 +27,7 @@ const ChatPage = () => {
 
         {/* Chat Pane - hidden on mobile until a chat is selected; always visible on md+ */}
         <div
-          className={`flex-1 flex flex-col bg-slate-800/50 backdrop-blur-sm ${
+          className={`flex-1 min-h-0 flex flex-col bg-slate-800/50 backdrop-blur-sm ${
             selectedUser ? "flex" : "hidden md:flex"
           }`}
         >
